@@ -16,7 +16,9 @@ window.onload = function() {
         });
     }
 
-    let ws = new WebSocket("ws://localhost:8080/websocket");
+    console.log(window.location);
+    let ws = new WebSocket(
+        window.location.origin.replace('http', 'ws') + "/websocket");
 
     ws.onopen = () => function() {
         ws.send("ohai");
