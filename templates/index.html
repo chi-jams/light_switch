@@ -1,0 +1,14 @@
+{% extends "common.html" %}
+{% block title %}Somewhere{% endblock %}
+{% block head %}
+    <script type="text/javascript" src="formstuff"></script>
+{% endblock %}
+
+{% block content%}
+  <div>Welcome to ChiSaiTea!</div>
+  <div>
+    <input type="range" id="hue" name="hue" min="0" max="65535">
+    <input type="range" id="sat" name="sat" min="0" max="255">
+    <input type="range" id="bri" name="bri" min="0" max="255">
+  <div>
+{% endblock %}

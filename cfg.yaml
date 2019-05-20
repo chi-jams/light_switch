@@ -1,0 +1,4 @@
+server_ip: 'localhost'
+server_port: 8080
+hue_ip: 10.0.0.14
+group: 'Chi'
