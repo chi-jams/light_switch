@@ -7,6 +7,7 @@ from gevent.pywsgi import WSGIServer
 from geventwebsocket import WebSocketError
 from geventwebsocket.handler import WebSocketHandler
 from jinja2 import Template
+import json
 from multiprocessing import Process, Queue
 from phue import Bridge
 import yaml
@@ -33,14 +34,18 @@ def handle_websocket():
     if not ws:
         abort(400, 'Expected a websocket request!')
 
+    init_vals = {'init_vals':
+            {key: bridge.get_group(cfg['group'])['action'][key] for key in
+                    ('hue', 'sat', 'bri')}}
+    ws.send(json.dumps(init_vals))
+
     while True:
         try:
             msg = ws.receive()
-            print('I got a thing: {}'.format(msg))
             cmd_queue.put(msg)
 
-        except WebSocketError:
-            print("There's an error")
+        except WebSocketError as err:
+            print("There's an error: {}".format(err))
             break
 
 @app.route('/formstuff')
@@ -53,10 +58,9 @@ def feed_static():
 # slider be extremely unresponsive. This alleviates that, but it'd be best to
 # figure out how to push changes to multiple lights and values in one go. This
 # is my lame solution using the library though.
-def set_lights(cmd_queue):
-    b = Bridge(cfg['hue_ip'])
-    b.connect()
-    room = b.get_group(cfg['group'])
+def set_lights(bridge, cmd_queue):
+    room = bridge.get_group(cfg['group'])
+    print(room)
     last_settings = None
     while True:
         msg = None
@@ -65,11 +69,11 @@ def set_lights(cmd_queue):
             msg = cmd_queue.get()
 
         if msg and last_settings != msg:
-            print('Wat: {}'.format(msg))
             last_settings = msg
+            print(msg)
             # Bold move parsing text and expecting it to just work
             for name, val in literal_eval(msg).items():
-                b.set_light([int(i) for i in room["lights"]], name, val,
+                bridge.set_light([int(i) for i in room["lights"]], name, val,
                         transitiontime=1)
 
 if __name__ == '__main__':
@@ -77,7 +81,9 @@ if __name__ == '__main__':
     server = WSGIServer((cfg['server_ip'], cfg['server_port']), app,
         handler_class=WebSocketHandler)
     cmd_queue = Queue()
-    t = Process(target = set_lights, args = (cmd_queue,))
+    bridge = Bridge(cfg['hue_ip'])
+    bridge.connect()
+    t = Process(target = set_lights, args = (bridge, cmd_queue))
 
     try:
         t.start()
