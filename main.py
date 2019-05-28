@@ -48,6 +48,8 @@ def handle_websocket():
             print("There's an error: {}".format(err))
             break
 
+# Thought this would be able to just be a static directory, but it was being
+# weird and dropping the file type so here we are.
 @app.route('/formstuff')
 def feed_static():
     return static_file('formstuff.js', root='./static/')
