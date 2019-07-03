@@ -36,7 +36,7 @@ def handle_websocket():
 
     init_vals = {'init_vals':
             {key: bridge.get_group(cfg['group'])['action'][key] for key in
-                    ('hue', 'sat', 'bri')}}
+                    ('hue', 'sat', 'bri', 'on')}}
     ws.send(json.dumps(init_vals))
 
     while True:
@@ -74,7 +74,7 @@ def set_lights(bridge, cmd_queue):
             last_settings = msg
             print(msg)
             # Bold move parsing text and expecting it to just work
-            for name, val in literal_eval(msg).items():
+            for name, val in json.loads(msg).items():
                 bridge.set_light([int(i) for i in room["lights"]], name, val,
                         transitiontime=1)
 

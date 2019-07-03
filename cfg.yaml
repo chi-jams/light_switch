@@ -2,5 +2,5 @@
 # is particularly dangerous to have exposed and it works as a sample
 server_ip: 'localhost'
 server_port: 8080
-hue_ip: 10.0.0.14
+hue_ip: 10.0.0.11
 group: 'Chi'
