@@ -28,7 +28,7 @@ window.onload = function() {
         setLightValue('hue', light_settings);
         setLightValue('sat', light_settings);
         setLightValue('bri', light_settings);
-        document.getElementById(field).checked = init_data['on'];
+        document.getElementById('on').checked = light_settings['on'];
     };
 
     createChangeListener(ws, 'hue', 'value', parseInt);

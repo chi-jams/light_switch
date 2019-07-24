@@ -48,19 +48,23 @@ def handle_websocket():
             print("There's an error: {}".format(err))
             break
 
-# Thought this would be able to just be a static directory, but it was being
-# weird and dropping the file type so here we are.
 @app.route('/formstuff')
 def feed_static():
+    '''
+    Thought this would be able to just be a static directory, but it was being
+    weird and dropping the file type so here we are.
+    '''
     return static_file('formstuff.js', root='./static/')
 
-# So this is dumb, why do we do this? Basically the Python Philips Hue API takes
-# at least 0.1 seconds to make light changes, and can go up to wait times as
-# long as a second. Since the set_light function blocks this makes dragging a
-# slider be extremely unresponsive. This alleviates that, but it'd be best to
-# figure out how to push changes to multiple lights and values in one go. This
-# is my lame solution using the library though.
 def set_lights(bridge, cmd_queue):
+    '''
+    So this is dumb, why do we do this? Basically the Python Philips Hue API
+    takes at least 0.1 seconds to make light changes, and can go up to wait
+    times as long as a second. Since the set_light function blocks this makes
+    dragging a slider be extremely unresponsive. This alleviates that, but it'd
+    be best to figure out how to push changes to multiple lights and values in
+    one go. This is my lame solution using the library though.
+    '''
     room = bridge.get_group(cfg['group'])
     print(room)
     last_settings = None
