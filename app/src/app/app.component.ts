@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { ColorPickerService } from 'ngx-color-picker';
+import { WsService } from './ws.service';
 
 @Component({
   selector: 'app-root',
@@ -10,11 +11,11 @@ import { ColorPickerService } from 'ngx-color-picker';
 export class AppComponent {
   title = 'app';
 
-  constructor(private cpService: ColorPickerService) { }
+  constructor(private cpService: ColorPickerService, private wsService: WsService) { }
 
-  public onChange(color: string): string {
+  public onChange(color: string): void {
     const hsva = this.cpService.stringToHsva(color, true);
     console.log(hsva);
-    return '';
+    this.wsService.sendColor(hsva);
   }
 }

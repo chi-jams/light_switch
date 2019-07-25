@@ -46,7 +46,7 @@ def handle_websocket():
 
         except WebSocketError as err:
             print("There's an error: {}".format(err))
-            break
+            return
 
 @app.route('/formstuff')
 def feed_static():
@@ -66,21 +66,26 @@ def set_lights(bridge, cmd_queue):
     one go. This is my lame solution using the library though.
     '''
     room = bridge.get_group(cfg['group'])
-    print(room)
     last_settings = None
     while True:
-        msg = None
-        # We only care about the last command
-        while not cmd_queue.empty():
-            msg = cmd_queue.get()
+        try:
+            msg = None
+            # We only care about the last command
+            while not cmd_queue.empty():
+                msg = cmd_queue.get()
 
-        if msg and last_settings != msg:
-            last_settings = msg
-            print(msg)
-            # Bold move parsing text and expecting it to just work
-            for name, val in json.loads(msg).items():
-                bridge.set_light([int(i) for i in room["lights"]], name, val,
-                        transitiontime=1)
+            if msg and last_settings != msg:
+                last_settings = msg
+                print(msg)
+                # Bold move parsing text and expecting it to just work
+                for name, val in json.loads(msg).items():
+                    bridge.set_light([int(i) for i in room["lights"]], name, val,
+                            transitiontime=1)
+        except json.decoder.JSONDecodeError as err:
+            print("Failed to decode JSON message!: {}".format(err))
+        except IndexError as err:
+            print("Wtf phue is doing something dumb again: {}".format(err))
+
 
 if __name__ == '__main__':
     cfg = yaml.load(open(DEFAULT_CFG, 'r').read(), Loader=Loader)
