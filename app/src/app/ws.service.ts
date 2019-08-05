@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Hsva } from 'ngx-color-picker';
+import { LightSettings } from './lightSettings';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 
 const ws = webSocket('ws://localhost:8080/websocket');
@@ -14,13 +15,8 @@ export class WsService {
     ws.subscribe();
   }
 
-  public sendColor(color: Hsva): void {
-    const lightSettings = {
-      hue: Math.round(65535 * color.h),
-      sat: Math.round(255 * color.s),
-      bri: Math.round(255 * color.v),
-      on: color.v > 0
-    };
-    ws.next(lightSettings);
+  public sendColor(settings: LightSettings): void {
+    console.log(settings);
+    ws.next(settings);
   }
 }
