@@ -23,7 +23,7 @@ DEFAULT_CFG = "cfg.yaml"
 app = Bottle()
 
 @app.route('/')
-@jinja2_view('index.html', template_lookup=['templates'])
+@jinja2_view('app/dist/app/index.html')
 def index():
     return {}
 
@@ -48,13 +48,13 @@ def handle_websocket():
             print("There's an error: {}".format(err))
             return
 
-@app.route('/formstuff')
-def feed_static():
+@app.route('/<resource>')
+def feed_static(resource):
     '''
     Thought this would be able to just be a static directory, but it was being
     weird and dropping the file type so here we are.
     '''
-    return static_file('formstuff.js', root='./static/')
+    return static_file(resource, root='./static/')
 
 def set_lights(bridge, cmd_queue):
     '''

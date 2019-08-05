@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
+import { MatSlideToggleChange } from '@angular/material';
 import { ColorPickerService } from 'ngx-color-picker';
+import { LightSettings } from './lightSettings';
 import { WsService } from './ws.service';
 
 @Component({
@@ -10,12 +12,24 @@ import { WsService } from './ws.service';
 })
 export class AppComponent {
   title = 'app';
+  on = true;
+  light = new LightSettings();
 
   constructor(private cpService: ColorPickerService, private wsService: WsService) { }
 
-  public onChange(color: string): void {
+  public onColorChange(color: string, on: boolean): void {
     const hsva = this.cpService.stringToHsva(color, true);
-    console.log(hsva);
-    this.wsService.sendColor(hsva);
+    this.light.hue = Math.round(65535 * hsva.h);
+    this.light.sat = Math.round(255 * hsva.s);
+    this.light.bri = Math.round(255 * hsva.v);
+    this.light.on = this.on && hsva.v > 0;
+    this.wsService.sendColor(this.light);
+  }
+
+  public onSwitchChange(toggle: MatSlideToggleChange) {
+    console.log(toggle.checked);
+    this.on = toggle.checked;
+    this.light.on = this.on && this.light.bri > 0;
+    this.wsService.sendColor(this.light);
   }
 }
